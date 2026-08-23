@@ -74,19 +74,16 @@ export default function Home() {
     setLoading(false);
   };
 
-  // PERBAIKAN 1: Jalankan fetchData hanya 1 kali saat halaman diload
   useEffect(() => {
     fetchData();
   }, []);
 
-  // PERBAIKAN 2: Jalankan Observer HANYA setelah loading selesai
   useEffect(() => {
-    if (loading) return; // Jangan jalankan observer jika data belum dirender
+    if (loading) return;
 
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
 
-    // Beri jeda sedikit agar React selesai merender elemen DOM baru dari database
     const timer = setTimeout(() => {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -110,7 +107,7 @@ export default function Home() {
   useEffect(() => {
     if (berita.length === 0) return;
     const interval = setInterval(() => {
-      setFeaturedIndex((prev) => (prev + 1) % Math.min(berita.length, 3)); // Maksimal 3 berita utama
+      setFeaturedIndex((prev) => (prev + 1) % Math.min(berita.length, 3)); 
     }, 4000);
     return () => clearInterval(interval);
   }, [berita]);
@@ -151,7 +148,6 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedAlbum, nextSlide, prevSlide, selectedBerita]);
 
-  // Data Berita Utama (Top 3)
   const featuredBerita = berita.slice(0, 3);
 
   return (
@@ -183,7 +179,6 @@ export default function Home() {
         @keyframes popup { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-popup { animation: popup 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* Animasi overlay artikel agar mulus */
         @keyframes slideUp { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
@@ -400,10 +395,8 @@ export default function Home() {
                       decoding="async"
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[20s] ease-out bg-[#E8E3D9]"
                     />
-                    {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1A251E] via-[#1A251E]/50 to-transparent"></div>
 
-                    {/* Konten Slider */}
                     <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 flex flex-col md:flex-row justify-between items-end gap-6">
                       <div className="max-w-3xl">
                         <div className="flex items-center gap-3 mb-4">
@@ -418,7 +411,6 @@ export default function Home() {
                         </p>
                       </div>
 
-                      {/* Tombol Baca */}
                       <button className="hidden md:flex shrink-0 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white hover:text-[#1A251E] text-white px-8 py-4 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 items-center gap-3">
                         <BookOpen className="w-4 h-4" /> Baca Artikel
                       </button>
@@ -426,7 +418,6 @@ export default function Home() {
                   </div>
                 ))}
 
-                {/* Indikator Titik + Progress (Dots) */}
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
                   {featuredBerita.map((_, idx) => (
                     <div
@@ -506,33 +497,35 @@ export default function Home() {
                Belum ada foto.
              </div>
           ) : (
-            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 2xl:columns-5 gap-6 space-y-6 group/gallery">
+            // PERBAIKAN: Mengubah Columns/Masonry menjadi seragam dengan Grid dan Aspect Ratio
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-6 group/gallery">
               {filteredGaleri.map((album, idx) => {
                 const images = parseImages(album.image_url);
                 const coverImage = images[0];
 
                 return (
-                  // PERBAIKAN 3: Memberikan bg color dan min-height (agar tidak terjadi layout shift) pada wrapper galeri
                   <div
                     key={album.id}
                     onClick={() => openAlbum(album)}
-                    className={`reveal delay-${(idx % 4) * 100} break-inside-avoid relative rounded-[2rem] overflow-hidden cursor-pointer group/item transition-all duration-500 hover:!opacity-100 group-hover/gallery:opacity-50 bg-[#E8E3D9] min-h-[250px]`}
+                    // Menggunakan aspect-square di HP dan aspect-[4/5] di laptop. Menghapus min-h agar tidak ada space kosong.
+                    className={`reveal delay-${(idx % 4) * 100} relative rounded-[1rem] md:rounded-[2rem] overflow-hidden cursor-pointer group/item transition-all duration-500 hover:!opacity-100 group-hover/gallery:opacity-50 bg-[#E8E3D9] aspect-square md:aspect-[4/5] shadow-sm hover:shadow-xl`}
                   >
+                    {/* Menggunakan absolute inset-0 agar fill 100% dari atas sampai bawah */}
                     <img 
                       src={coverImage} 
                       alt={album.title} 
-                      className="w-full h-full object-cover transform group-hover/item:scale-110 transition duration-700 ease-out" 
+                      className="absolute inset-0 w-full h-full object-cover transform group-hover/item:scale-110 transition duration-700 ease-out" 
                       loading="lazy" 
                       decoding="async"
                     />
                     {images.length > 1 && (
-                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white text-[10px] px-3 py-1.5 rounded-full font-bold tracking-widest flex items-center gap-1.5 z-10 shadow-lg">
-                        <Layers className="w-3.5 h-3.5 text-[#D4A373]" /> {images.length} FOTO
+                      <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-black/60 backdrop-blur-sm text-white text-[9px] md:text-[10px] px-2.5 py-1.5 md:px-3 md:py-1.5 rounded-full font-bold tracking-widest flex items-center gap-1 md:gap-1.5 z-10 shadow-lg">
+                        <Layers className="w-3 h-3 md:w-3.5 md:h-3.5 text-[#D4A373]" /> {images.length} FOTO
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-0 group-hover/item:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end text-white">
-                      <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#D4A373] mb-2">{album.category}</span>
-                      <h4 className="font-display text-xl leading-snug">{album.title}</h4>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-0 group-hover/item:opacity-100 transition-all duration-500 p-4 md:p-8 flex flex-col justify-end text-white">
+                      <span className="text-[9px] md:text-[10px] uppercase font-bold tracking-[0.2em] text-[#D4A373] mb-1.5 md:mb-2">{album.category}</span>
+                      <h4 className="font-display text-base md:text-xl leading-snug line-clamp-2">{album.title}</h4>
                     </div>
                   </div>
                 );
@@ -546,7 +539,6 @@ export default function Home() {
       {selectedBerita && (
         <div className="fixed inset-0 z-[200] bg-[#F4F1EA] overflow-y-auto animate-slide-up">
 
-          {/* Header Tombol Kembali */}
           <div className="sticky top-0 z-50 bg-[#F4F1EA]/90 backdrop-blur-md border-b border-[#E8E3D9] px-6 py-4 flex justify-between items-center">
             <button
               onClick={() => setSelectedBerita(null)}
@@ -558,8 +550,6 @@ export default function Home() {
           </div>
 
           <div className="max-w-4xl mx-auto bg-white min-h-screen shadow-2xl relative pb-32">
-
-            {/* Foto Cover Artikel */}
             <div className="w-full h-[40vh] md:h-[60vh] bg-[#E8E3D9] relative">
               <img
                 src={selectedBerita.image_url || 'https://images.unsplash.com/photo-1540317580384-e5d43616b9aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'}
@@ -569,11 +559,7 @@ export default function Home() {
                 decoding="async"
               />
             </div>
-
-            {/* Konten Artikel */}
             <div className="px-8 md:px-16 py-12 md:py-20 -mt-16 relative z-10 bg-white rounded-t-[3rem]">
-
-              {/* Meta Info */}
               <div className="flex flex-wrap items-center gap-4 mb-6">
                 <span className="bg-[#EAE5D9] text-[#D4A373] px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest">
                   {selectedBerita.category}
@@ -582,13 +568,9 @@ export default function Home() {
                   <Calendar className="w-4 h-4"/> {selectedBerita.date}
                 </span>
               </div>
-
-              {/* Judul */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-display text-[#1A251E] leading-[1.1] mb-8">
                 {selectedBerita.title}
               </h1>
-
-              {/* Pemisah Author */}
               <div className="flex items-center gap-4 border-y border-[#E8E3D9] py-6 mb-12">
                 <div className="w-12 h-12 bg-[#1A251E] text-white rounded-full flex items-center justify-center">
                   <Users className="w-6 h-6" />
@@ -598,14 +580,11 @@ export default function Home() {
                   <p className="text-sm font-semibold text-[#1A251E]">{selectedBerita.author || 'Tim KKN 52'}</p>
                 </div>
               </div>
-
-              {/* Paragraf Artikel */}
               <div className="prose prose-lg max-w-none text-gray-600 font-light leading-relaxed">
                 {selectedBerita.content.split('\n').map((paragraph, index) => (
                   <p key={index} className="mb-6">{paragraph}</p>
                 ))}
               </div>
-
             </div>
           </div>
         </div>
@@ -614,30 +593,45 @@ export default function Home() {
       {/* LIGHTBOX MODAL GALERI */}
       {selectedAlbum && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
-          <div className="absolute inset-0 bg-[#1A251E]/80 backdrop-blur-md cursor-pointer" onClick={() => setSelectedAlbum(null)}></div>
+          <div className="absolute inset-0 bg-[#1A251E]/90 backdrop-blur-md cursor-pointer" onClick={() => setSelectedAlbum(null)}></div>
+          
           {albumImages.length > 1 && (
-            <button onClick={prevSlide} className="absolute left-4 md:left-10 bg-white/10 hover:bg-white/30 text-white p-3 md:p-4 rounded-full backdrop-blur-md transition-all duration-300 z-20 hover:scale-110">
+            <button onClick={prevSlide} className="absolute left-2 md:left-8 bg-white/10 hover:bg-white/30 text-white p-2.5 md:p-4 rounded-full backdrop-blur-md transition-all duration-300 z-20 hover:scale-110">
               <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
             </button>
           )}
-          <div className="relative bg-white rounded-[2rem] p-4 md:p-6 w-full max-w-4xl shadow-2xl z-10 animate-popup flex flex-col max-h-full">
-            <button onClick={() => setSelectedAlbum(null)} className="absolute -top-4 -right-4 md:-top-5 md:-right-5 bg-white text-[#1A251E] hover:bg-red-500 hover:text-white p-3 rounded-full shadow-xl transition-all duration-300 z-30"><X className="w-6 h-6" /></button>
-            <div className="bg-[#1A251E] rounded-[1.5rem] overflow-hidden flex items-center justify-center relative flex-1 min-h-[30vh] md:min-h-[50vh] max-h-[65vh]">
-              <img key={currentSlideIndex} src={albumImages[currentSlideIndex]} alt={`${selectedAlbum.title} - ${currentSlideIndex + 1}`} className="w-full h-full object-contain animate-fade-in" />
+          
+          <div className="relative bg-white rounded-[1.5rem] md:rounded-[2rem] p-3 md:p-6 w-full max-w-5xl shadow-2xl z-10 animate-popup flex flex-col">
+            <button onClick={() => setSelectedAlbum(null)} className="absolute -top-3 -right-3 md:-top-5 md:-right-5 bg-white text-[#1A251E] hover:bg-red-500 hover:text-white p-2.5 md:p-3 rounded-full shadow-xl transition-all duration-300 z-30">
+              <X className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+            
+            {/* PERBAIKAN: Menghapus fixed min-height & kotak gelap agar gambar tampil natural dengan rasio aslinya up to max-height, sehingga terbebas dari space kosong yang mengganggu.*/}
+            <div className="w-full flex items-center justify-center relative rounded-[1rem] overflow-hidden">
+              <img 
+                key={currentSlideIndex} 
+                src={albumImages[currentSlideIndex]} 
+                alt={`${selectedAlbum.title} - ${currentSlideIndex + 1}`} 
+                className="w-auto h-auto max-w-full max-h-[65vh] md:max-h-[75vh] object-contain animate-fade-in" 
+              />
             </div>
-            <div className="mt-6 px-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0">
+            
+            <div className="mt-4 md:mt-6 px-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="inline-block px-3 py-1 bg-[#F4F1EA] text-[#D4A373] rounded-full text-[10px] uppercase font-bold tracking-widest">{selectedAlbum.category}</span>
-                  {albumImages.length > 1 && <span className="text-xs font-bold tracking-widest text-gray-400">FOTO {currentSlideIndex + 1} / {albumImages.length}</span>}
+                <div className="flex items-center gap-2 md:gap-3 mb-2">
+                  <span className="inline-block px-3 py-1 bg-[#F4F1EA] text-[#D4A373] rounded-full text-[9px] md:text-[10px] uppercase font-bold tracking-widest">{selectedAlbum.category}</span>
+                  {albumImages.length > 1 && <span className="text-[10px] md:text-xs font-bold tracking-widest text-gray-400">FOTO {currentSlideIndex + 1} / {albumImages.length}</span>}
                 </div>
-                <h3 className="text-2xl md:text-3xl font-display text-[#1A251E] pr-4">{selectedAlbum.title}</h3>
+                <h3 className="text-xl md:text-3xl font-display text-[#1A251E] pr-4">{selectedAlbum.title}</h3>
               </div>
-              <a href={albumImages[currentSlideIndex]} target="_blank" rel="noreferrer" className="inline-flex shrink-0 items-center gap-2 px-6 py-3 border-2 border-[#1A251E] text-[#1A251E] hover:bg-[#1A251E] hover:text-white rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300">Resolusi Penuh <ArrowUpRight className="w-4 h-4" /></a>
+              <a href={albumImages[currentSlideIndex]} target="_blank" rel="noreferrer" className="inline-flex shrink-0 items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 border-2 border-[#1A251E] text-[#1A251E] hover:bg-[#1A251E] hover:text-white rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-300">
+                Resolusi Penuh <ArrowUpRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              </a>
             </div>
           </div>
+          
           {albumImages.length > 1 && (
-            <button onClick={nextSlide} className="absolute right-4 md:right-10 bg-white/10 hover:bg-white/30 text-white p-3 md:p-4 rounded-full backdrop-blur-md transition-all duration-300 z-20 hover:scale-110">
+            <button onClick={nextSlide} className="absolute right-2 md:right-8 bg-white/10 hover:bg-white/30 text-white p-2.5 md:p-4 rounded-full backdrop-blur-md transition-all duration-300 z-20 hover:scale-110">
               <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
             </button>
           )}
