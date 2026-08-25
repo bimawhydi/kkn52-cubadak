@@ -3,11 +3,12 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, Key, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
+import { Lock, Mail, Key, ArrowLeft, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State untuk visibilitas password
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -84,13 +85,26 @@ export default function LoginPage() {
             <div className="relative group">
               <Key className="w-5 h-5 text-gray-400 absolute left-4 top-3.5 group-focus-within:text-[#D4A373] transition-colors" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-white border-2 border-[#E8E3D9] rounded-2xl pl-12 pr-4 py-3.5 text-sm text-[#1A251E] placeholder-gray-300 focus:outline-none focus:border-[#D4A373] focus:ring-4 focus:ring-[#D4A373]/10 transition-all duration-300"
+                className="w-full bg-white border-2 border-[#E8E3D9] rounded-2xl pl-12 pr-12 py-3.5 text-sm text-[#1A251E] placeholder-gray-300 focus:outline-none focus:border-[#D4A373] focus:ring-4 focus:ring-[#D4A373]/10 transition-all duration-300"
               />
+              {/* Tombol Toggle Eye */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-3.5 text-gray-400 hover:text-[#D4A373] focus:outline-none transition-colors"
+                aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </div>
 

@@ -246,7 +246,7 @@ export default function AdminDashboard() {
   const getImageCount = (urlStr: string) => { try { const p = JSON.parse(urlStr); return Array.isArray(p) ? p.length : 1; } catch { return 1; } };
 
   return (
-    <div className="min-h-screen bg-[#F4F1EA] text-[#2C3531] font-ui">
+    <div className="min-h-[100dvh] bg-[#F4F1EA] text-[#2C3531] font-ui">
 
       <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -291,11 +291,11 @@ export default function AdminDashboard() {
 
       {/* SIDEBAR — drawer di mobile (bisa dibuka/tutup), panel tetap di desktop */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-[280px] bg-[#1A251E] text-[#FAF8F5] z-50 flex flex-col shadow-2xl
+        className={`fixed top-0 left-0 bottom-0 h-[100dvh] w-[280px] bg-[#1A251E] text-[#FAF8F5] z-50 flex flex-col shadow-2xl
         transition-transform duration-300 ease-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
       >
-        <div className="p-7 md:p-8 border-b border-white/10 flex items-start justify-between">
+        <div className="p-7 md:p-8 border-b border-white/10 flex items-start justify-between shrink-0">
           <div>
             <div className="w-11 h-11 bg-[#3D5A45] rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-[#3D5A45]/30 relative">
               <FolderOpen className="w-5 h-5 text-white" />
@@ -314,7 +314,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <nav className="flex-1 p-5 md:p-6 space-y-3 overflow-y-auto">
+        <nav className="flex-1 p-5 md:p-6 space-y-3 overflow-y-auto min-h-0">
           <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-4 pl-4">Menu Konten</p>
           <button
             onClick={() => { setTab('galeri'); resetFormGaleri(); setSidebarOpen(false); }}
@@ -334,7 +334,7 @@ export default function AdminDashboard() {
           </button>
         </nav>
 
-        <div className="p-5 md:p-6 border-t border-white/10 space-y-3">
+        <div className="p-5 md:p-6 pb-8 lg:pb-6 border-t border-white/10 space-y-3 shrink-0">
           <a href="/" className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-all">
             <ArrowLeft className="w-4 h-4" /> Buka Website Publik
           </a>
